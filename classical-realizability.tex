@@ -11,9 +11,14 @@
 \newcommand{\contra}{\ensuremath{\mathbf{contra}}}
 \newcommand{\obvious}[1]{\inferrule{ }{#1}}
 
+\newcommand{\val}[1]{#1\ \mathbf{val}}
 \newcommand{\push}{\rhd}
 \newcommand{\pull}{\lhd}
 \newcommand{\ap}[1]{\mathtt{ap}(-;\ #1)}
+\newcommand{\throw}[1]{\mathtt{throw}(#1;\ -)}
+\newcommand{\callcc}{\mathtt{callcc}~}
+\newcommand{\cont}{\mathtt{cont}}
+\newcommand{\ite}[3]{\mathtt{if}\ #1\ \mathtt{then}\ #2\ \mathtt{else}\ #3}
 
 \title{Classical Realizability}
 \author{Danny Gratzer}
@@ -138,14 +143,15 @@ ourselves open to the possibility of more rules being added.
 
 The trouble is that continuations are hard to give nice operational
 semantics to. To handle this, I've opted to give a stack machine
-presentation of the language. So our semantics will have two
-judgments, $k \push e$ and $k \pull e$. In the first judgment we're
-working by examining some term $e$ and building up some surrounding
-context/continuation $k$. This judgment doesn't really do any work, it
-sets us up for $k \pull e$ which takes some $e$ that we don't know how
-to reduce any further and works back through $k$ performing reductions
-as it goes. For example, the inferences governing how lambda
-abstraction and application in our language work are
+presentation of the language. So our semantics will have three
+judgments, $\val{e}$, $k \push e$ and $k \pull e$. In the second
+judgment we're working by examining some term $e$ and building up some
+surrounding context/continuation $k$. This judgment doesn't really do
+any work, it sets us up for $k \pull e$ which takes some $e$ that we
+don't know how to reduce any further and works back through $k$
+performing reductions as it goes. For example, the inferences
+governing how lambda abstraction and application in our language work
+are
 
 \begin{mathpar}
   \inferrule{ }{k \push e\ e' \mapsto k;\ \ap{e'} \push e} \and
@@ -160,6 +166,47 @@ $\push$ because we have no more expressions to decompose and we begin
 to work on $k$. In particular, whenever we try to $\pull$ a lambda
 through a continuation representing application we actually perform
 the relevant substitution.
+
+In addition to abstraction and application, we only need one more
+construct in our language. This means the grammar of our language may
+be specified as
+
+
+\[
+  \begin{array}{lcl}
+    e & ::= & x \mid \lambda x. e \mid e\ e \mid \callcc x. e \mid
+              \cont[k] \mid e \gg e \mid ...\\
+    k & ::= & \ap{e} \mid \throw{e} \mid ...
+  \end{array}
+\]
+
+The extra constructs we need specify how first class continuations
+work in our language. The full set of inferences we demand in our
+system is
+
+\begin{mathpar}
+  \inferrule{ }{\val{\lambda x. e}} \and
+  \inferrule{ }{\val{\cont[k]}} \and
+  \inferrule{\val{e}}{k \push e \mapsto k \pull e} \and
+  \inferrule{ }{k \push e\ e' \mapsto k;\ \ap{e'} \push e} \and
+  \inferrule{ }{k;\ \ap{e'} \pull \lambda x. e \mapsto k \push [e'/x]e} \and
+  \inferrule{ }{k \push \callcc x. e \mapsto k \push [\cont[k]/x]e} \and
+  \inferrule{ }{k \push e \gg e' \mapsto k; \throw{e} \push e'} \and
+  \inferrule{ }{k'; \throw{e} \pull \cont[k] \mapsto k \push e} \and
+\end{mathpar}
+
+Now we also want to have nice syntax for several derived forms.
+
+\begin{align*}
+  (e_1, e_2) &\triangleq \lambda f. f\ e_1\ e_2\\
+  \pi_1\ e &\triangleq e\ (\lambda x. \lambda y. x)\\
+  \pi_2\ e &\triangleq e\ (\lambda x. \lambda y. y)\\
+  tt &\triangleq \lambda x. \lambda y. x\\
+  ff &\triangleq \lambda x. \lambda y. y\\
+  \ite{e}{e_1}{e_2} &\triangleq e\ e_1\ e_2
+\end{align*}
+
+As it turns out, this will be plenty to formalize our theory.
 
 \section{The Realizability Model}
 
