@@ -11,6 +11,10 @@
 \newcommand{\contra}{\ensuremath{\mathbf{contra}}}
 \newcommand{\obvious}[1]{\inferrule{ }{#1}}
 
+\newcommand{\push}{\rhd}
+\newcommand{\pull}{\lhd}
+\newcommand{\ap}[1]{\mathtt{ap}(-;\ #1)}
+
 \title{Classical Realizability}
 \author{Danny Gratzer}
 \begin{document}
@@ -122,6 +126,40 @@ The remainder of the elimination rules as well as the metatheoretic
 properties of this system aren't going to be described.
 
 \section{A Computation System}
+
+Before we proceed with our realizability model we have to describe a
+computation system to use to model our programming language. Normally
+some variant of the lambda calculus suffices but for classical logic
+it's more convenient if our computation system includes
+continuations. As is typical with realizability, we
+won't specify the entirety of the language. Instead we'll describe
+several inferences we require to be valid in the system and leave
+ourselves open to the possibility of more rules being added.
+
+The trouble is that continuations are hard to give nice operational
+semantics to. To handle this, I've opted to give a stack machine
+presentation of the language. So our semantics will have two
+judgments, $k \push e$ and $k \pull e$. In the first judgment we're
+working by examining some term $e$ and building up some surrounding
+context/continuation $k$. This judgment doesn't really do any work, it
+sets us up for $k \pull e$ which takes some $e$ that we don't know how
+to reduce any further and works back through $k$ performing reductions
+as it goes. For example, the inferences governing how lambda
+abstraction and application in our language work are
+
+\begin{mathpar}
+  \inferrule{ }{k \push e\ e' \mapsto k;\ \ap{e'} \push e} \and
+  \inferrule{ }{k \push \lambda x.\ e \mapsto k \pull \lambda x. e} \and
+  \inferrule{ }{k;\ \ap{e'} \pull \lambda x. e \mapsto k \push [e'/x]e}
+\end{mathpar}
+
+When evaluating an application we push a new frame onto our stack of
+continuations and proceed in evaluation the function. Whenever we
+reach a $\lambda$ (or any value as we'll see) we stop trying to use
+$\push$ because we have no more expressions to decompose and we begin
+to work on $k$. In particular, whenever we try to $\pull$ a lambda
+through a continuation representing application we actually perform
+the relevant substitution.
 
 \section{The Realizability Model}
 
