@@ -2,6 +2,15 @@
 \usepackage{amsmath, amssymb, amsthm}
 \usepackage[parfill]{parskip}
 
+\usepackage{mathpartir}
+
+%% mathbf looks funky but I like it better than mathtt,
+%% alternatives?
+\newcommand{\true}[1]{\ensuremath{#1\ \mathbf{true}}}
+\newcommand{\false}[1]{\ensuremath{#1\ \mathbf{false}}}
+\newcommand{\contra}{\ensuremath{\mathbf{contra}}}
+\newcommand{\obvious}[1]{\inferrule{ }{#1}}
+
 \title{Classical Realizability}
 \author{Danny Gratzer}
 \begin{document}
@@ -28,6 +37,71 @@ computational interpretations aren't limited to constructive logics
 (just nice ones).
 
 \section{A Judgmental Formulation of Classical Logic}
+
+In order to formalize a computational interpretation of classical
+logic, we first have to formally define classical logic. I'll do this
+with the normal proof theoretic tools for doing this. We start by
+fixing some set of propositions we're interested in studying.
+
+\[
+  %% TODO: Generalize with \forall and \exists for a more interesting
+  %% model?
+  \begin{array}{lcl}
+    P & ::= & \top \mid \bot \mid P \wedge P \mid P \vee P \mid P
+              \supset P \mid \neg P
+  \end{array}
+\]
+
+We'd like to formulate the judgment \true{P}. Unlike in an
+intuitionistic logic, classical logic also needs the judgment
+\false{P} since proofs in this logic switch freely between searching
+for contradictions and building evidence. We also have a judgment for
+denoting a contradiction, \contra. This gives us some way to mediate
+between \true{P} and \false{P} and also let's us state double
+negation in a cleaner way.
+
+%% A constructive logic would never be so duplicated, my sense of smug
+%% superiority can be left intact.
+\begin{mathpar}
+  \inferrule{ }{\true{\top}} \and
+  \inferrule{ }{\false{\bot}} \and
+  \inferrule{\true{A} \\ \true{B}}{\true{A \wedge B}} \and
+  \inferrule{\false{A}}{\false{A \wedge B}} \and
+  \inferrule{\false{B}}{\false{A \wedge B}} \and
+  \inferrule{\true{A}}{\true{A \wedge B}} \and
+  \inferrule{\true{B}}{\true{A \wedge B}} \and
+  \inferrule{\false{A} \\ \false{B}}{\false{A \wedge B}} \and
+  \inferrule{\true{B}\ (\true{A})}{\true{A \supset B}} \and
+  \inferrule{\false{B}\ (\true{A})}{\false{A \supset B}} \and
+  \inferrule{\true{A}}{\false{\neg A}} \and
+  \inferrule{\false{A}}{\true{\neg A}}
+\end{mathpar}
+
+These rules govern the connective specific aspects of $\true{P}$ and
+$\false{P}$ but the real essence of the classical logic comes from how
+we let these two judgments interact through \contra,
+
+\begin{mathpar}
+  \inferrule{\true{A} \\ \false{A}}{\contra} \and
+  \inferrule{\contra \ (\false{A})}{\true{A}} \and
+  \inferrule{\contra \ (\true{A})}{\false{A}}
+\end{mathpar}
+
+Notice that I haven't defined any elimination rules for this
+system. It turns out that we can derive all of the by heavy use of
+contradiction.
+
+\[
+  \inferrule
+  {\inferrule{\inferrule{\obvious{\false{A}\ (\false{A})}}
+                        {\false{A \wedge B} \ (\false{A})} \\
+              \inferrule{D}{\true{A \wedge B}}}
+                        {\contra\ (\false{A})}}
+  {\true{A}}
+\]
+
+Now the middle rule governing contradiction gives us double negation
+easily enough
 
 \section{A Computation System}
 
