@@ -68,9 +68,9 @@ negation in a cleaner way.
   \inferrule{\true{A} \\ \true{B}}{\true{A \wedge B}} \and
   \inferrule{\false{A}}{\false{A \wedge B}} \and
   \inferrule{\false{B}}{\false{A \wedge B}} \and
-  \inferrule{\true{A}}{\true{A \wedge B}} \and
-  \inferrule{\true{B}}{\true{A \wedge B}} \and
-  \inferrule{\false{A} \\ \false{B}}{\false{A \wedge B}} \and
+  \inferrule{\true{A}}{\true{A \vee B}} \and
+  \inferrule{\true{B}}{\true{A \vee B}} \and
+  \inferrule{\false{A} \\ \false{B}}{\false{A \vee B}} \and
   \inferrule{\true{B}\ (\true{A})}{\true{A \supset B}} \and
   \inferrule{\false{B}\ (\true{A})}{\false{A \supset B}} \and
   \inferrule{\true{A}}{\false{\neg A}} \and
