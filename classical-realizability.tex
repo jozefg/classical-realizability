@@ -72,7 +72,7 @@ negation in a cleaner way.
   \inferrule{\true{B}}{\true{A \vee B}} \and
   \inferrule{\false{A} \\ \false{B}}{\false{A \vee B}} \and
   \inferrule{\true{B}\ (\true{A})}{\true{A \supset B}} \and
-  \inferrule{\false{B}\ (\true{A})}{\false{A \supset B}} \and
+  \inferrule{\true{A} \\ \false{B}}{\false{A \supset B}} \and
   \inferrule{\true{A}}{\false{\neg A}} \and
   \inferrule{\false{A}}{\true{\neg A}}
 \end{mathpar}
@@ -102,6 +102,24 @@ contradiction.
 
 Now the middle rule governing contradiction gives us double negation
 easily enough
+
+\[
+  \inferrule
+  {\inferrule
+   {\inferrule
+    {\inferrule
+     {\obvious{\false{A \vee \neg A}\ (\false{A \vee \neg A})}}
+     {\false{A}\ (\false{A \vee \neg A})}}
+    {\true{\neg A}\ (\false{A \vee \neg A})}\\
+    \inferrule
+     {\obvious{\false{A \vee \neg A}\ (\false{A \vee \neg A})}}
+     {\false{\neg A}\ (\false{A \vee \neg A})}}
+   {\contra\ (\false{A \vee \neg A})}}
+  {\true{A \vee \neg A}}
+\]
+
+The remainder of the elimination rules as well as the metatheoretic
+properties of this system aren't going to be described.
 
 \section{A Computation System}
 
